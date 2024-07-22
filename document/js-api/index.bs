@@ -1234,7 +1234,7 @@ To <dfn>create a suspending function</dfn> from a JavaScript function |func|, wi
                 1. Let |resultType| be [|results|].[0].
                 1. Let |returnValue| be [=ToWebAssemblyValue=](|v|, |resultType|).
                 1. Push |async_context| on to the [=ExecutionContext=] stack.
-                1. Resume the suspended evaluation of asyncContext using |returnValue| as the result of the operation that suspended it.
+                1. Resume the suspended evaluation of |async_context| using |returnValue| as the result of the operation that suspended it.
                 1. Return undefined.
             1. Let |onFulfilled| be [=CreateBuiltinFunction=](|fulled|,1,"",[])
             1. Let |rejected| be an [=AbstractClosure=] with parameters (|e|) that captures |async_context| and performs the following steps when called:
