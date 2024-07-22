@@ -1242,6 +1242,7 @@ To <dfn>create a suspending function</dfn> from a JavaScript function |func|, wi
                 1. Converts |e| to the WebAssembly exception |we|.
                 1. Push |async_context| on to the [=ExecutionContext=] stack.
                 1. Resume the suspended evaluation of asyncContext using throw |we| as the result of the operation that suspended it.
+                1. Note: revise this when integrating with EH proposal.
                 1. Return undefined.
             1. Let |onRejected| be [=CreateBuiltinFunction=](|rejected|,1,"",[])
             1. Perform [$PerformPromiseThen$](|promise|, |onResolved|, |onRejected|). 
