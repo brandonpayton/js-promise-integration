@@ -1168,7 +1168,7 @@ interface Suspending {
 </pre>
 
 <div algorithm>
-    The  <dfn method for="WebAssembly">promising(|wasmFun|)</dfn> function, when invoked, performs the following steps:
+    The  <dfn method for="WebAssembly">promising(|wasmFunc|)</dfn> function, when invoked, performs the following steps:
     1. If [$IsCallable$](|wasmFun|) is false, throw a {{TypeError}}.
     1. If |wasmFun| does not have a \[[FunctionAddress]] internal slot, throw a {{TypeError}}.
     1. Let |builder| be a new [=AbstractClosure=] with parameters that captures |wasmFun| that, when invoked, performs [=run a Promising function=].
