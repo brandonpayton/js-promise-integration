@@ -1150,7 +1150,7 @@ The algorithm <dfn>ToWebAssemblyValue</dfn>(|v|, |type|) coerces a JavaScript va
 
 <h3 id="jspi">JavaScript Promise Integration</h3>
 
-A {{Suspending}} object represents a JavaScript function whose calls should be *suspended* when they return a Promise object.
+A {{Suspending}} object represents a JavaScript function whose calls via WebAssembly imports should be *suspended* when they return a Promise object.
 Each {{Suspending}} object has a \[[wrappedFunction]] internal slot which holds a JavaScript function.
 
 In addition, the {{promising}} function takes as argument a WebAssembly function and returns a JavaScript function that returns a Promise that is resolved when the WebAssembly function completes.
@@ -1180,17 +1180,27 @@ interface Suspending {
     1. Let |promise| be a new [=PromiseCapabilityRecord=].
     1. Let |funcaddr| be the value of |wasmFunc|'s \[[FunctionAddress]] internal slot.
     1. Let |runner| be a new [=AbstractClosure=] of no arguments that captures |promise|, |funcaddr|, |arguments| that, when invoked, performs the following steps:
+        1. Let |store| be the [=surrounding agent=]'s [=associated store=].
         1. Let |functype| be [=func_type=](|store|, |funcaddr|).
         1. Let |args| be the result of [=coerce JavaScript arguments|coercing arguments=] (|functype|,|arguments|)
         1. Let (|store|, |result|) be the result of [=func_invoke=](|store|, |funcaddr|, |args|).
         1. Assert: if control reaches here, we have done waiting for suspended imports
-        1. If |result|.\[[Type]] is NORMAL,
-            1. Perform [=EvaluateCall=] (|promise|.\[[Resolve]],|result|.\[[Value]],false)
+        1. Set the [=surrounding agent=]'s [=associated store=] to |store|.
+        1. If |result| is [=error=], throw an exception. This exception should be a WebAssembly {{RuntimeError}} exception, unless otherwise indicated by <a href="#errors">the WebAssembly error mapping</a>.
+        1. Otherwise, if |result| is of the form [=throw=] exnaddr,
+            1. Perform [=EvaluateCall=] (|promise|.\[[Reject]],|result|.,false).
             1. Return UNDETERMINED
-        1. If |result|.\[[Type]] is THROW,
-            1. Perform [=EvaluateCall=] (|promise|.\[[Reject]],|result|.\[[Value]],false).
+        1. Otherwise, assert |result| is a [=list=] of WebAssembly values
+            1. Let |outArity| be the [=list/size=] of |result|.
+            1. If |outArity| is 0, return undefined.
+            1. Otherwise, if |outArity| is 1, let |jsReturnValue| be [=ToJSValue=](|result|[0]).
+            1. Otherwise,
+               1. Let |values| be « ».
+               1. [=list/iterate|For each=] |r| of |result|,
+               1. [=list/Append=] [=ToJSValue=](|r|) to |values|.
+               1. let |jsReturnValue| be [$CreateArrayFromList$](|values|).
+            1. Perform [=EvaluateCall=] (|promise|.\[[Resolve]],|jsReturnValue|,false)
             1. Return UNDETERMINED
-        1. Assert fatal error
     1. Let |con| be [=CreateBuiltinFunction=](|runner|,0,"",<<>>)
     1. Perform [$Call$](|con|, undefined, <<>>)
     1. Returns |promise|
