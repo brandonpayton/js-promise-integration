@@ -336,7 +336,7 @@ A {{Module}} object represents a single WebAssembly module. Each {{Module}} obje
                     1. Let |funcaddr| be the value of |v|'s \[[FunctionAddress]] internal slot.
                 1. Otherwise,
                     1. [=Create a host function=] from |v| and |functype|, and let |funcaddr| be the result.
-            1. If |v| has a \[[wrappedFunction]] insternal slot
+            1. Otherwise, if |v| has a \[[wrappedFunction]] insternal slot
                     1. Let |func| be the value of |v|'s \[[wrappedFunction]] internal slot.
                     1. Assert: [$IsCallable$](|func|) is true
                     1. [=Create a suspending function|create a suspending function=] from |func| and |functype|, and let |funcaddr| be the result.
